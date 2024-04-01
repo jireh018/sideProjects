@@ -19,6 +19,12 @@ The `sfdx-project.json` file contains useful configuration information for your 
 
 
 Note: 
+This project will consist of:
+ - a mix of declarative and custom development,
+ - fields creation (if necessary),
+ - Validation rules,
+ - and more...
+
 I like to start by thinking about the algorithm then write the simple code I can think of.
 Then start the refactoring phase where I anaylze and check for codes that can be extracted into a new method, better way to implement features and testing each implementation/extraction using the 'Anonymous Window' in Developer Edition org.
 
