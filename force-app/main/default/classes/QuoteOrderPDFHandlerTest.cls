@@ -51,6 +51,9 @@ public class QuoteOrderPDFHandlerTest {
         //3. Assert
         //assert to check if we have any pdf in order record
         System.assertEquals(1, results.size(), 'There should only be 1 pdf inserted');
+        // Verify that the PDF is now attached to the Order
+        List<ContentDocumentLink> orderPDFs = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :insertedOrderId];
+        System.assertEquals(1, orderPDFs.size(), 'Should have one PDF attached to the Order');
     }
     
     @isTest
