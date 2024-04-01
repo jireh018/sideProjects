@@ -24,3 +24,5 @@ Then start the refactoring phase where I anaylze and check for codes that can be
 
 Same goes for test classes, 
 define all methods needed by testing best, worst cases scenarios and then refactoring code by extracting load data into a setup method or even utility class.
+
+And I usually code from the 'Developer Console' Because of the real-time error check feature
