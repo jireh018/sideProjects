@@ -36,39 +36,44 @@ public class QuoteOrderPDFHandler {
         }
 */
         
-        try{
-            List<ContentDocumentLink> quotePDFs = retrieveQuotePDFs(quoteOrderIdsMap.keySet());
-            List<ContentDocumentLink> orderPDFs = new List<ContentDocumentLink>();
-            
-            for(ContentDocumentLink quotePdf: quotePDFs){
-                Id quoteId = quotePdf.LinkedEntityId;
-                Id orderId = quoteOrderIdsMap.get(quoteId);//quotePdf.LinkedEntityId captures quoteIds for each pdf 
-                //and we get use quoteId to get related or associated value which is orderId
-                if(orderId != null){
-                    ContentDocumentLink oPdf = new ContentDocumentLink(
-                        ContentDocumentId = quotePDF.ContentDocumentId,
-                        LinkedEntityId = orderId,
-                        ShareType = 'V',
-                        Visibility = 'AllUsers'
-                    );
-                    orderPDFs.add(oPdf);
+        if(!quoteOrderIdsMap.isEmpty()){
+            try{
+                List<ContentDocumentLink> quotePDFs = retrieveQuotePDFs(quoteOrderIdsMap.keySet());
+                List<ContentDocumentLink> orderPDFs = prepareOrderPDFs(quoteOrderIdsMap, quotePDFs, results);          
+                /*
+                for(ContentDocumentLink quotePdf: quotePDFs){
+                    Id quoteId = quotePdf.LinkedEntityId;
+                    Id orderId = quoteOrderIdsMap.get(quoteId);//quotePdf.LinkedEntityId captures quoteIds for each pdf 
+                    //and we get use quoteId to get related or associated value which is orderId
+                    if(orderId != null){
+                        ContentDocumentLink oPdf = new ContentDocumentLink(
+                            ContentDocumentId = quotePDF.ContentDocumentId,
+                            LinkedEntityId = orderId,
+                            ShareType = 'V',
+                            Visibility = 'AllUsers'
+                        );
+                        orderPDFs.add(oPdf);
+                    }else{
+                        //no order Ids found! for given quote Id
+                        results.add(new Result('No order Ids found for quote Id: ' + quoteId, false));
+                    }
+                }
+    */
+                /*
+                if(!orderPDFs.isEmpty()){
+                    insert orderPDFs;
+                    for(Id orderId : quoteOrderIdsMap.values()){
+                        results.add(new Result('Pdfs attached to Order Id: ' + orderId, true));
+                    }
                 }else{
-                    //no order Ids found! for given quote Id
-                    results.add(new Result('No order Ids found for quote Id: ' + quoteId, false));
+                    results.add(new Result('No Pdfs attached!', false));
                 }
+*/
+                insertOrderPDFs(quoteOrderIdsMap, orderPDFs, results);
+            }catch(Exception ex){
+                System.debug('Error while attaching quote Pdfs to order.');
+                results.add(new Result('Error while attaching quote Pdfs to order.', false));
             }
-
-            if(!orderPDFs.isEmpty()){
-                insert orderPDFs;
-                for(Id orderId : quoteOrderIdsMap.values()){
-                    results.add(new Result('Pdfs attached to Order Id: ' + orderId, true));
-                }
-            }else{
-                results.add(new Result('No Pdfs attached!', false));
-            }
-        }catch(Exception ex){
-            System.debug('Error while attaching quote Pdfs to order.');
-            results.add(new Result('Error while attaching quote Pdfs to order.', false));
         }
         
         return results;
@@ -96,7 +101,37 @@ public class QuoteOrderPDFHandler {
                ];
     }
     
-    private static List<ContentDocumentLink> prepareOrderPDFs(List<ContentDocumentLink> quotePDFs, List<Result> results){
-        return null;
+    private static List<ContentDocumentLink> prepareOrderPDFs(Map<Id, Id> quoteOrderIdsMap,List<ContentDocumentLink> quotePDFs, List<Result> results){
+        List<ContentDocumentLink> orderPDFs = new List<ContentDocumentLink>();
+        
+        for(ContentDocumentLink quotePdf: quotePDFs){
+                Id quoteId = quotePdf.LinkedEntityId;
+                Id orderId = quoteOrderIdsMap.get(quoteId);//quotePdf.LinkedEntityId captures quoteIds for each pdf 
+                //and we get use quoteId to get related or associated value which is orderId
+                if(orderId != null){
+                    ContentDocumentLink oPdf = new ContentDocumentLink(
+                        ContentDocumentId = quotePDF.ContentDocumentId,
+                        LinkedEntityId = orderId,
+                        ShareType = 'V',
+                        Visibility = 'AllUsers'
+                    );
+                    orderPDFs.add(oPdf);
+                }else{
+                    //no order Ids found! for given quote Id
+                    results.add(new Result('No order Ids found for quote Id: ' + quoteId, false));
+                }
+            }
+        return orderPDFs;
+    }
+    
+    private static void insertOrderPDFs(Map<Id, Id> quoteOrderIdsMap, List<ContentDocumentLink> orderPDFs, List<Result> results){
+        if(!orderPDFs.isEmpty()){
+            insert orderPDFs;
+            for(Id orderId : quoteOrderIdsMap.values()){
+                results.add(new Result('Pdfs attached to Order Id: ' + orderId, true));
+            }
+        }else{
+            results.add(new Result('No Pdfs attached!', false));
+        }
     }
 }
