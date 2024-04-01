@@ -13,6 +13,8 @@ public class QuoteOrderPDFHandlerTest {
         Date todayDate = Date.today();
         Order newOrder = new Order(AccountId=accountEngineering.Id, EffectiveDate=todayDate, Status='Draft');
         insert newOrder;
+        Order newOrder2 = new Order(AccountId=accountEngineering.Id, EffectiveDate=todayDate + 1, Status='Draft');
+        insert newOrder2;
     }
     
     @isTest
@@ -28,7 +30,8 @@ public class QuoteOrderPDFHandlerTest {
         //link it to Quote
         Id contentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvPDF.Id].ContentDocumentId;
         Id insertedQuoteId = [SELECT Id FROM Quote WHERE Name = 'Test Quote'].Id;
-        Id insertedOrderId = [SELECT Id FROM Order WHERE EffectiveDate=: Date.today()].Id;
+        Id insertedOrderIdWithPDF = [SELECT Id FROM Order WHERE EffectiveDate=: Date.today() AND Status='Draft'].Id;
+        Id insertedOrderIdWithNoPDF = [SELECT Id FROM Order WHERE EffectiveDate=: Date.today() + 1 AND Status='Draft'].Id;
         // Then, create a ContentDocumentLink to link it to the Quote
         ContentDocumentLink cdl = new ContentDocumentLink(
             ContentDocumentId = contentDocumentId,
@@ -40,7 +43,7 @@ public class QuoteOrderPDFHandlerTest {
         
         QuoteOrderPDFHandler.ObjectIds ids = new QuoteOrderPDFHandler.ObjectIds();
         ids.quoteId = insertedQuoteId;
-        ids.orderId = insertedOrderId;
+        ids.orderId = insertedOrderIdWithPDF;
         List<QuoteOrderPDFHandler.ObjectIds> idList = new List<QuoteOrderPDFHandler.ObjectIds>();
         idList.add(ids);
         //2. Test
@@ -52,20 +55,28 @@ public class QuoteOrderPDFHandlerTest {
         //assert to check if we have any pdf in order record
         System.assertEquals(1, results.size(), 'There should only be 1 pdf inserted');
         // Verify that the PDF is now attached to the Order
-        List<ContentDocumentLink> orderPDFs = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :insertedOrderId];
+        List<ContentDocumentLink> orderPDFs = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :insertedOrderIdWithPDF];
         System.assertEquals(1, orderPDFs.size(), 'Should have one PDF attached to the Order');
+        // Verify that the PDF is not attached to the Order
+        List<ContentDocumentLink> order2PDFs = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :insertedOrderIdWithNoPDF];
+        System.assertEquals(0, order2PDFs.size(), 'Should have no PDF attached to the Order');
     }
     
     @isTest
-    static void testattachQuotePDFsToRelatedOrderWithNoPDFs(){
-        //1. Load
-        //insert Quote
-        //insert Order
-        //create PDF
-        //link it to Quote
-        //2. Test
+    static void testattachQuotePDFsToRelatedOrderWithNoOrder(){
+        Id insertedQuoteId = [SELECT Id FROM Quote WHERE Name = 'Test Quote'].Id;
+        QuoteOrderPDFHandler.ObjectIds ids = new QuoteOrderPDFHandler.ObjectIds();
+        ids.quoteId = insertedQuoteId;
+        //ids.orderId = insertedOrderIdWithPDF;
+        List<QuoteOrderPDFHandler.ObjectIds> idList = new List<QuoteOrderPDFHandler.ObjectIds>();
+        idList.add(ids);
+        
+        Test.startTest();
         //call the QuoteOrderPDFHandler class
+        List<QuoteOrderPDFHandler.Result> results = QuoteOrderPDFHandler.attachQuotePDFsToRelatedOrder(idList);
+        Test.stopTest();
         //3. Assert
-        //assert to confirm we dont have any pdf in order record
+        //assert to check if we have any pdf in order record
+        System.assertNotEquals(0, results.size(), 'There should be 0 pdf inserted');
     }
 }
