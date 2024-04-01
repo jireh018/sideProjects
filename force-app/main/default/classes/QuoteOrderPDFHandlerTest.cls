@@ -1,17 +1,22 @@
 @isTest
 public class QuoteOrderPDFHandlerTest {
-    @isTest
-    static void testattachQuotePDFsToRelatedOrderWithPDFs(){
+    @testSetup
+    static void loadTestData(){
         //1. Load
-        //fetch account of type engineering
-        Account accountEngineering = [SELECT Id FROM Account WHERE Industry = 'Engineering'];
+        //insert Account of type Engineering
+        Account accountEngineering = new Account(Name='Test Account', Industry='Engineering');
+        insert accountEngineering;
         //insert Quote
         Quote newQuote = new Quote(Name='Test Quote', Account__c=accountEngineering.Id);
         insert newQuote;
         //insert Order
         Date todayDate = Date.today();
-        Order newOrder = new Order(AccountId=accountEngineering.Id, EffectiveDate=todayDate);
+        Order newOrder = new Order(AccountId=accountEngineering.Id, EffectiveDate=todayDate, Status='Draft');
         insert newOrder;
+    }
+    
+    @isTest
+    static void testattachQuotePDFsToRelatedOrderWithPDFs(){
         //create and insert PDF
         ContentVersion cvPDF = new ContentVersion(
             Title='Test PDF',
@@ -22,19 +27,30 @@ public class QuoteOrderPDFHandlerTest {
         insert cvPDF;
         //link it to Quote
         Id contentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvPDF.Id].ContentDocumentId;
-
+        Id insertedQuoteId = [SELECT Id FROM Quote WHERE Name = 'Test Quote'].Id;
+        Id insertedOrderId = [SELECT Id FROM Order WHERE EffectiveDate=: Date.today()].Id;
         // Then, create a ContentDocumentLink to link it to the Quote
         ContentDocumentLink cdl = new ContentDocumentLink(
             ContentDocumentId = contentDocumentId,
-            LinkedEntityId = newQuote.Id,
+            LinkedEntityId = insertedQuoteId,
             ShareType = 'V', // V for View access
             Visibility = 'AllUsers'
         );
         insert cdl;
+        
+        QuoteOrderPDFHandler.ObjectIds ids = new QuoteOrderPDFHandler.ObjectIds();
+        ids.quoteId = insertedQuoteId;
+        ids.orderId = insertedOrderId;
+        List<QuoteOrderPDFHandler.ObjectIds> idList = new List<QuoteOrderPDFHandler.ObjectIds>();
+        idList.add(ids);
         //2. Test
+        Test.startTest();
         //call the QuoteOrderPDFHandler class
+        List<QuoteOrderPDFHandler.Result> results = QuoteOrderPDFHandler.attachQuotePDFsToRelatedOrder(idList);
+        Test.stopTest();
         //3. Assert
         //assert to check if we have any pdf in order record
+        System.assertEquals(1, results.size(), 'There should only be 1 pdf inserted');
     }
     
     @isTest
