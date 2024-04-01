@@ -16,3 +16,11 @@ The `sfdx-project.json` file contains useful configuration information for your 
 - [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
 - [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
 - [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+
+
+Note: 
+I like to start by thinking about the algorithm then write the simple code I can think of.
+Then start the refactoring phase where I anaylze and check for codes that can be extracted into a new method, better way to implement features and testing each implementation/extraction using the 'Anonymous Window' in Developer Edition org.
+
+Same goes for test classes, 
+define all methods needed by testing best, worst cases scenarios and then refactoring code by extracting load data into a setup method or even utility class.
