@@ -24,6 +24,8 @@ public class ConvertTextToQuoteLineItems {
         List<Result> results = new List<Result>();
         
         if(!inputRequests.isEmpty()){
+            addQuoteLineItemsToResult(inputRequests, results);
+            /*
             for(InputRequest singleIR: inputRequests){
                 String[] fields = singleIR.inputText?.split('\t');
                 Result result = new Result();
@@ -38,8 +40,25 @@ public class ConvertTextToQuoteLineItems {
                 }
                 
             }
+*/
         }
-        
         return results;
+    }
+    
+    private static void addQuoteLineItemsToResult(List<InputRequest> inputRequests, List<Result> results){
+        for(InputRequest singleIR: inputRequests){
+                String[] fields = singleIR.inputText?.split('\t');
+                Result result = new Result();
+                
+                if(fields.size() >= 5){
+                    result.productCode = fields[0];
+                    result.description = fields[2];
+                    result.quantity = Integer.valueOf(fields[3]);
+                    result.unitPrice = Decimal.valueOf(fields[4]?.replace('$', '').replace(' ', '').replace(',', '.'));
+                    
+                    results.add(result);
+                }
+                
+            }
     }
 }
