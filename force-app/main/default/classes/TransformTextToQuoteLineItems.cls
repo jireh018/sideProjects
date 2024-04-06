@@ -32,11 +32,24 @@ public class TransformTextToQuoteLineItems {
     public static void transformAndInsertQuoteLineItems(List<InputRequest> inputRequests){
         List<Result> results = new List<Result>();
         Map<Id, String> quoteLineItemMap = new Map<Id, String>();
-        String[] fields = null;
+        Map<Id, List<String>> quoteLineItemMapToBeInserted = new Map<Id, List<String>>();
+        
+        Integer i = 0;
         
         for(InputRequest inputRequest: inputRequests){
             quoteLineItemMap.put(inputRequest.quoteId, inputRequest.inputText);
         }
-        System.debug('quoteLineItemMap size ' + quoteLineItemMap.size());
+        
+        for(Id quoteId : quoteLineItemMap.KeySet()){
+            String[] quoteLineItemsForEachQuoteId = quoteLineItemMap.get(quoteId)?.split('\n');
+            quoteLineItemMapToBeInserted.put(quoteId, quoteLineItemsForEachQuoteId);
+            for(String p: quoteLineItemsForEachQuoteId){
+                System.debug(i + ' Quote Id ' + quoteId + ' product ' + p);
+            }
+            i++;
+        }
+        
+        System.debug('quoteLineItemMapToBeInserted ' + quoteLineItemMapToBeInserted);
+        //System.debug('quoteLineItemMap size ' + quoteLineItemMap.size());
     }
 }
