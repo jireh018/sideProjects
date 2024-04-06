@@ -33,6 +33,7 @@ public class TransformTextToQuoteLineItems {
         List<Result> results = new List<Result>();
         Map<Id, String> quoteLineItemMap = new Map<Id, String>();
         Map<Id, List<String>> quoteLineItemMapToBeInserted = new Map<Id, List<String>>();
+        List<QuoteLineItem> allquoteLineItemsToBeInserted = new List<QuoteLineItem>();
         
         Integer i = 0;
         
@@ -44,12 +45,21 @@ public class TransformTextToQuoteLineItems {
             String[] quoteLineItemsForEachQuoteId = quoteLineItemMap.get(quoteId)?.split('\n');
             quoteLineItemMapToBeInserted.put(quoteId, quoteLineItemsForEachQuoteId);
             for(String p: quoteLineItemsForEachQuoteId){
-                System.debug(i + ' Quote Id ' + quoteId + ' product ' + p);
+                String[] sanitizeProduct = p.split('\t');
+                QuoteLineItem qLI = new QuoteLineItem();
+                qLI.quoteId = quoteId;
+                qLI.productCode = sanitizeProduct[0];
+                qLI.description = sanitizeProduct[2];
+                qLI.quantity = Integer.valueOf(sanitizeProduct[3]);
+                qLI.unitPrice = Decimal.valueOf(sanitizeProduct[4]?.replace('$', '').replace(' ', '').replace(',', '.'));
+                
+                allquoteLineItemsToBeInserted.add(qlI);
             }
             i++;
         }
         
-        System.debug('quoteLineItemMapToBeInserted ' + quoteLineItemMapToBeInserted);
-        //System.debug('quoteLineItemMap size ' + quoteLineItemMap.size());
+        for(QuoteLineItem qLI: allquoteLineItemsToBeInserted){
+            System.debug('qlI ' + qlI);
+        }
     }
 }
