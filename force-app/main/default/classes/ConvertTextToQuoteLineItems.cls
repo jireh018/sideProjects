@@ -27,31 +27,7 @@ public class ConvertTextToQuoteLineItems {
             System.debug(inputRequests.size());
             String[] allQuoteLineItemsLines = prepareAllQuoteLineItemsLines(inputRequests);
             
-            /*
-            for(InputRequest singleIR: inputRequests){
-                //split the it into an array in case the client paste 2 or more products in one go
-            	allQuoteLineItemsLines = singleIR.inputText?.split('\n');
-            }
-*/
-            
             addQuoteLineItemsToResult(allQuoteLineItemsLines, results);
-            //addQuoteLineItemsToResult(inputRequests, results);
-            /*
-            for(InputRequest singleIR: inputRequests){
-                String[] fields = singleIR.inputText?.split('\t');
-                Result result = new Result();
-                
-                if(fields.size() >= 5){
-                    result.productCode = fields[0];
-                    result.description = fields[2];
-                    result.quantity = Integer.valueOf(fields[3]);
-                    result.unitPrice = Decimal.valueOf(fields[4]?.replace('$', '').replace(' ', '').replace(',', '.'));
-                    
-                    results.add(result);
-                }
-                
-            }
-*/
         }
         return results;
     }
@@ -80,23 +56,5 @@ public class ConvertTextToQuoteLineItems {
                 results.add(result);
             }
         }
-    }
-    
-/*    
-private static void addQuoteLineItemsToResult(List<InputRequest> inputRequests, List<Result> results){
-        for(InputRequest singleIR: inputRequests){
-            String[] fields = singleIR.inputText?.split('\t');
-            Result result = new Result();
-            
-            if(fields.size() >= 5){
-                result.productCode = fields[0];
-                result.description = fields[2];
-                result.quantity = Integer.valueOf(fields[3]);
-                result.unitPrice = Decimal.valueOf(fields[4]?.replace('$', '').replace(' ', '').replace(',', '.'));
-                
-                results.add(result);
-            }
-        }
-    }
-*/
+    } 
 }
