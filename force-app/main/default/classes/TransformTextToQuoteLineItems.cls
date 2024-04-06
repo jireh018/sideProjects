@@ -31,10 +31,12 @@ public class TransformTextToQuoteLineItems {
     @InvocableMethod(label='Transform Products Text to Quote Line Items And Insert' description='Transform Products Text to Quote Line Items and Insert them.')
     public static void transformAndInsertQuoteLineItems(List<InputRequest> inputRequests){
         List<Result> results = new List<Result>();
-        Integer i = 0;
+        Map<Id, String> quoteLineItemMap = new Map<Id, String>();
+        String[] fields = null;
+        
         for(InputRequest inputRequest: inputRequests){
-            System.debug(' count ' + i + ' ' + inputRequest.quoteId + ' - ' + inputRequest.inputText);
-            i++;
+            quoteLineItemMap.put(inputRequest.quoteId, inputRequest.inputText);
         }
+        System.debug('quoteLineItemMap size ' + quoteLineItemMap.size());
     }
 }
